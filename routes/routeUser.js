@@ -1,9 +1,9 @@
-const UserModel = require("../models/userModel");
+const userModel = require("../models/userModel");
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
 const generateToken = require("../config/jwtConfig");
-const isAuthenticated = require("../middlewares/theAuthenticated");
+const theAuthenticated = require("../middlewares/theAuthenticated");
 const salt_Rooms = 10;
 
 router.post("/signup", async (req, res) => {
@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
 
     const salt = bcrypt.genSaltSync(salt_Rooms);
     const passwordHash = bcrypt.hashSync(password, salt);
-    const result = await UserModel.create({ name, email, passwordHash });
+    const result = await userModel.create({ name, email, passwordHash });
 
     res.status(201).json(result);
   } catch (err) {
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
   try {
 
     const { email, password } = req.body;
-    const foundUser = await UserModel.findOne({ email });
+    const foundUser = await userModel.findOne({ email });
     console.log(`found user ${foundUser}`)
 
     if (!foundUser) {
@@ -55,14 +55,21 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.get("/profile", isAuthenticated, async (req, res) => {
+router.get("/profile", theAuthenticated, async (req, res) => {
   try {
-    const user = await UserModel.findOne({ _id: req.user._id }).populate({
-      path: "orders",
-      model: "Order",
+
+    const user = await userModel.findOne({ _id: req.user._id }).populate({
+      path: "rooms",
+      model: "rooms",
+    });
+
+     .populate({
+      path: "reviews",
+      model: "reviews",
     });
 
     res.status(200).json(user);
+
   } catch (err) {
     console.log(err);
   }

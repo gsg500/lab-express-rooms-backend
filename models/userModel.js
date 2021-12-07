@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
     match: /[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+/gm,
   },
   passwordHash: { type: String, required: true },
-  orders: [{ type: mongoose.Types.ObjectId, ref: "Room" }],
+  rooms: [{ type: mongoose.Types.ObjectId, ref: "room" }],
+  reviews: [{ type: mongoose.Types.ObjectId, ref: "review" }],
 });
 
 module.exports = mongoose.model("User", UserSchema);
